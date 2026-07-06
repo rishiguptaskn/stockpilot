@@ -11,3 +11,4 @@
 
 export { initSupabase, getSupabase, type SupabaseInitOptions } from './client';
 export { candidatesService } from './candidates';
+export { stocksService } from './stocks';

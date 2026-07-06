@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { AppShell } from '@/components/layout/app-shell';
 import { StatCard } from '@/components/stat-card';
+import { UniverseStat } from '@/components/dashboard/universe-stat';
 import { MarketStatusCard } from '@/components/dashboard/market-status-card';
 import { CandidatesTable } from '@/components/dashboard/candidates-table';
 import { SectorStrip } from '@/components/dashboard/sector-strip';
@@ -132,13 +133,14 @@ export default function TodayPage() {
         </div>
 
         {/* Stat row */}
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
           <StatCard
             label="Capital"
             value="₹5,00,000"
             hint="Available"
             icon={<Landmark className="h-4 w-4" />}
           />
+          <UniverseStat />
           <StatCard
             label="Open positions"
             value="0 / 5"
