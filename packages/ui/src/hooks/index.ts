@@ -1,1 +1,1 @@
-export { useTopCandidates } from './useTopCandidates.js';
+export { useTopCandidates } from './useTopCandidates';

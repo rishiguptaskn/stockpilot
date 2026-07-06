@@ -6,7 +6,7 @@
  */
 
 import type { TradeCandidate } from '@stockpilot/types';
-import { getSupabase } from './client.js';
+import { getSupabase } from './client';
 
 export const candidatesService = {
   /**

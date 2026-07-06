@@ -9,5 +9,5 @@
  *   2. Then use the service objects (candidatesService, etc.) anywhere.
  */
 
-export { initSupabase, getSupabase, type SupabaseInitOptions } from './client.js';
-export { candidatesService } from './candidates.js';
+export { initSupabase, getSupabase, type SupabaseInitOptions } from './client';
+export { candidatesService } from './candidates';
