@@ -10,7 +10,8 @@ import { UniverseStat } from '@/components/dashboard/universe-stat';
 import { MarketStatusCard } from '@/components/dashboard/market-status-card';
 import { CandidatesTable } from '@/components/dashboard/candidates-table';
 import { SectorStrip } from '@/components/dashboard/sector-strip';
-import { Button } from '@/components/ui/button';
+import { RunWorkflowButton } from '@/components/dashboard/run-workflow-button';
+import { AddTradeDialog } from '@/components/trades/add-trade-dialog';
 import { Badge } from '@/components/ui/badge';
 
 // ----------------------------------------------------------------------------
@@ -108,10 +109,8 @@ export default function TodayPage() {
       }
       actions={
         <>
-          <Button variant="outline" size="sm">
-            Run workflow
-          </Button>
-          <Button size="sm">Add trade</Button>
+          <RunWorkflowButton />
+          <AddTradeDialog />
         </>
       }
     >
