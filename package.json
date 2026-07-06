@@ -1,0 +1,21 @@
+{
+  "name": "stockpilot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-Powered Swing Trading Operating System for Indian Equities",
+  "packageManager": "pnpm@11.10.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @stockpilot/web dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "clean": "pnpm -r exec rimraf node_modules .next dist"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  }
+}

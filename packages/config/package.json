@@ -1,0 +1,10 @@
+{
+  "name": "@stockpilot/config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared configuration (tsconfig, eslint, prettier, tailwind) for the StockPilot monorepo",
+  "files": [
+    "tsconfig.base.json",
+    "tsconfig.next.json"
+  ]
+}
