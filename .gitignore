@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+*.egg-info/
+.turbo/
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+.pytest_cache/
+
+# Supabase
+supabase/.branches/
+supabase/.temp/
+
+# Data (never commit market data or API keys)
+data/
+*.csv
+*.parquet
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
