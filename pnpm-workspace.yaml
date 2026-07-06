@@ -1,3 +1,10 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+# Trusted build scripts — pnpm blocks postinstall by default for security.
+# sharp: image optimization for Next.js (safe, from vercel/next.js maintainers)
+# unrs-resolver: fast module resolver used by rspack/turbopack (safe, from unjs)
+allowBuilds:
+  sharp: true
+  unrs-resolver: true

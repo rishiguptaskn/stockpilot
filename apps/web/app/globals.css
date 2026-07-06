@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+/* --------------------------------------------------------------------------
+   StockPilot — Design tokens (dark-mode first per PLAN.md § 11)
+
+   Sensible defaults with `# DECISION NEEDED` items to be confirmed:
+     - Accent colors (emerald/rose/amber/blue) from Tailwind palette
+     - Neutral gray = Tailwind zinc
+     - Fonts = Geist Sans (UI) + Geist Mono (numbers)
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Dark-first. Light mode via prefers-color-scheme below. */
+  --background: #09090b;     /* zinc-950 */
+  --foreground: #fafafa;     /* zinc-50 */
+
+  --muted: #18181b;          /* zinc-900 */
+  --muted-foreground: #a1a1aa; /* zinc-400 */
+
+  --border: #27272a;         /* zinc-800 */
+
+  --accent-bullish: #10b981; /* emerald-500 */
+  --accent-bearish: #f43f5e; /* rose-500 */
+  --accent-warning: #f59e0b; /* amber-500 */
+  --accent-info: #3b82f6;    /* blue-500 */
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #ffffff;
+    --foreground: #09090b;
+    --muted: #f4f4f5;
+    --muted-foreground: #71717a;
+    --border: #e4e4e7;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-bullish: var(--accent-bullish);
+  --color-bearish: var(--accent-bearish);
+  --color-warning: var(--accent-warning);
+  --color-info: var(--accent-info);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+}
+
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Monospace for numbers, tickers, code */
+.font-mono, code, kbd, samp, pre {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-feature-settings: "cv02", "cv03", "cv04";
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@stockpilot/ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared reusable UI components + hooks. Design tokens live here.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./hooks": "./src/hooks/index.ts",
+    "./components": "./src/components/index.ts",
+    "./lib": "./src/lib/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@stockpilot/services": "workspace:*",
+    "@stockpilot/types": "workspace:*",
+    "@tanstack/react-query": "^5.62.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@stockpilot/config": "workspace:*",
+    "@types/react": "^19",
+    "typescript": "^5.5.4"
+  }
+}
