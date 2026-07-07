@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { TradingViewChart } from '@/components/stock/tradingview-chart';
+import { AiResearchPanel } from '@/components/stock/ai-research-panel';
 import { getServerSupabase } from '@/lib/supabase/server';
 
 interface Params {
@@ -106,6 +107,9 @@ export default async function StockDetailPage({
         <Card className="overflow-hidden p-0">
           <TradingViewChart symbol={tvSymbol} />
         </Card>
+
+        {/* AI research report — Master + Technical agents over the rule engine */}
+        <AiResearchPanel ticker={normalizedTicker} />
 
         {/* Rule breakdown placeholder */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

@@ -20,6 +20,7 @@ from stockpilot_api.engine.module_7_volume import RULES as M7_RULES
 from stockpilot_api.engine.module_8_news import RULES as M8_RULES
 from stockpilot_api.engine.module_9_risk import RULES as M9_RULES
 from stockpilot_api.engine.module_10_portfolio import RULES as M10_RULES
+from stockpilot_api.routers.agents import router as agents_router
 from stockpilot_api.workflow import run_workflow
 
 logging.basicConfig(level=logging.INFO)
@@ -40,6 +41,8 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=True,
 )
+
+app.include_router(agents_router)
 
 
 @app.get("/health")

@@ -21,6 +21,9 @@ dependencies = [
     "httpx>=0.27",
     "python-dotenv>=1.0",
     "structlog>=24.4",
+    "anthropic>=0.40",
+    "mcp>=1.1",
+    "pyjwt>=2.9",
 ]
 
 [project.optional-dependencies]

@@ -123,3 +123,85 @@ export interface MarketSnapshot {
   diiNetLast10: number;
   vix: number;
 }
+
+// ---------- AI Agent layer ----------
+// Mirrors apps/api/src/stockpilot_api/agents/schemas.py. Every number in a report
+// originates from an MCP tool call — agents never fabricate market data.
+
+export type Stance = 'bullish' | 'neutral' | 'bearish';
+
+/** One data-backed claim, tied to the MCP tool that produced it. */
+export interface Evidence {
+  claim: string;
+  sourceTool: string; // e.g. "detect_patterns"
+  ruleId?: string; // e.g. "M5.3"
+  citation?: string; // e.g. "[O] O'Neil"
+}
+
+/** A single domain agent's verdict on a ticker. */
+export interface AgentFinding {
+  agentName: string;
+  stance: Stance;
+  confidence: number; // 0-1
+  summary: string;
+  evidence: Evidence[];
+  invalidation: string;
+  dataAvailable: boolean;
+}
+
+/** The Master agent's synthesis across all domain findings. */
+export interface ResearchReport {
+  ticker: StockTicker;
+  asOf: ISODate;
+  overallStance: Stance;
+  confidence: number; // 0-1
+  masterSynthesis: string;
+  findings: AgentFinding[];
+  uncertainties: string[];
+  aggregateScore?: number;
+  verdict?: string;
+  disclaimer: string;
+  generatedAt?: ISODateTime;
+  /** Populated by the API response (not the model). */
+  runId?: string;
+  costUsd?: number;
+}
+
+/** SSE events streamed from GET /agents/analyze/stream. */
+export type AgentStreamEvent =
+  | { type: 'agent_started'; agent: string }
+  | { type: 'tool_call'; agent: string; tool: string; args: Record<string, unknown> }
+  | { type: 'agent_finding'; agent: string; finding: AgentFindingWire }
+  | { type: 'report'; agent: string; report: ResearchReportWire }
+  | { type: 'done'; report: ResearchReportWire & { run_id?: string; cost_usd?: number } }
+  | { type: 'error'; detail: string };
+
+/**
+ * Wire shapes: the API serialises Pydantic models with snake_case field names.
+ * Use `normalizeReport` (in the web app) to map these to the camelCase types above.
+ */
+export interface AgentFindingWire {
+  agent_name: string;
+  stance: Stance;
+  confidence: number;
+  summary: string;
+  evidence: Array<{ claim: string; source_tool: string; rule_id?: string; citation?: string }>;
+  invalidation: string;
+  data_available: boolean;
+}
+
+export interface ResearchReportWire {
+  ticker: string;
+  as_of: string;
+  overall_stance: Stance;
+  confidence: number;
+  master_synthesis: string;
+  findings: AgentFindingWire[];
+  uncertainties: string[];
+  aggregate_score?: number;
+  verdict?: string;
+  disclaimer: string;
+  generated_at?: string;
+  run_id?: string;
+  cost_usd?: number;
+}
