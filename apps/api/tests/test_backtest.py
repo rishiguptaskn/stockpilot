@@ -188,6 +188,35 @@ class TestEngineFills:
         assert result.skipped_signals["gap_below_stop"] == 1
 
 
+class TestTrailingExit:
+    def test_trail_exit_on_close_below_ema(self):
+        # steady rise then a sharp break below the short EMA → "trail" exit
+        rows = [(100, 101, 99, 100)] + [(100 + i, 101 + i, 99 + i, 100 + i) for i in range(1, 10)]
+        rows += [(108, 109, 95, 96)] + flat(5, 96)  # hard close below the rising EMA
+        cfg = BacktestConfig(costs=ZERO_COSTS, use_target=False, trail_ema_days=5,
+                             max_hold_days=50)
+        result = run_backtest({"T.NS": bars(rows)},
+                              scan_once([sig(ticker="T.NS", stop=80.0, target=999.0)]), cfg)
+        assert len(result.trades) == 1
+        assert result.trades[0].exit_reason == "trail"
+
+    def test_no_target_exit_when_use_target_false(self):
+        # price rockets through the old 3R target but use_target=False → no target exit
+        rows = [(100, 101, 99, 100), (100, 101, 99, 100), (100, 130, 99, 128)] + flat(4, 128)
+        cfg = BacktestConfig(costs=ZERO_COSTS, use_target=False, max_hold_days=5)
+        result = run_backtest({"T.NS": bars(rows)}, scan_once([sig(ticker="T.NS")]), cfg)
+        assert len(result.trades) == 1
+        assert result.trades[0].exit_reason == "time"  # held to the time stop instead
+
+    def test_stop_still_wins_over_trail(self):
+        # both stop-touch and EMA-break same bar → stop (conservative ordering)
+        rows = [(100, 101, 99, 100)] + flat(3, 100) + [(100, 101, 92, 93)] + flat(4, 93)
+        cfg = BacktestConfig(costs=ZERO_COSTS, use_target=False, trail_ema_days=3,
+                             max_hold_days=50)
+        result = run_backtest({"T.NS": bars(rows)}, scan_once([sig(ticker="T.NS")]), cfg)
+        assert result.trades[0].exit_reason == "stop"
+
+
 class TestEngineRiskCaps:
     def test_two_pct_position_sizing(self):
         # 2% of 500,000 = 10,000 risk budget; risk/share 7 → 1428 shares

@@ -53,4 +53,12 @@ class BacktestConfig:
     max_hold_days: int = 20  # swing time stop (trading days)
     scan_every_n_days: int = 5  # weekly scan cadence (trading days)
     min_score: float = 90.0  # aggregate score threshold to act (PLAN.md §8)
+
+    # Exit style. use_target=True exits at the signal's fixed target (current
+    # production geometry). trail_ema_days enables a trailing exit on a close
+    # below the N-day EMA — the Minervini sell-backstop approach.
+    # # TUNABLE — verify exact MA length from source (Minervini uses 10/21/50-day
+    # backstops depending on trade duration; 21 is the common swing default).
+    use_target: bool = True
+    trail_ema_days: int | None = None
     costs: CostConfig = field(default_factory=CostConfig)

@@ -27,7 +27,7 @@ from stockpilot_api.backtest.costs import buy_costs_inr, sell_costs_inr
 
 logger = logging.getLogger(__name__)
 
-ExitReason = Literal["stop", "gap_stop", "target", "time"]
+ExitReason = Literal["stop", "gap_stop", "target", "trail", "time"]
 
 
 @dataclass(frozen=True)
@@ -107,6 +107,15 @@ def run_backtest(
     """
     cfg = config or BacktestConfig()
     costs = cfg.costs
+
+    # Trailing exit: precompute the N-day EMA per ticker. EMA at day t uses only
+    # closes <= t, so reading it inside the walk-forward loop is point-in-time.
+    emas: dict[str, pd.Series] = {}
+    if cfg.trail_ema_days is not None:
+        emas = {
+            t: df["close"].ewm(span=cfg.trail_ema_days, adjust=False).mean()
+            for t, df in data.items()
+        }
 
     calendar = sorted(set().union(*(df.index for df in data.values())))
     if not calendar:
@@ -199,9 +208,18 @@ def run_backtest(
             elif lo <= pos.stop:
                 exit_fill = pos.stop * (1 - costs.slippage_pct)
                 reason = "stop"  # conservative: stop checked BEFORE target
-            elif h >= pos.target:
+            elif cfg.use_target and h >= pos.target:
                 exit_fill = pos.target  # limit order — no slippage
                 reason = "target"
+            elif (
+                cfg.trail_ema_days is not None
+                and not entered_today
+                and ticker in emas
+                and c < float(emas[ticker].loc[today])
+            ):
+                # Minervini-style sell backstop: close below the trailing EMA.
+                exit_fill = c * (1 - costs.slippage_pct)
+                reason = "trail"
             else:
                 pos.holding_days += 1
                 if pos.holding_days >= cfg.max_hold_days:

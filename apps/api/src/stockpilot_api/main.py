@@ -21,6 +21,7 @@ from stockpilot_api.engine.module_8_news import RULES as M8_RULES
 from stockpilot_api.engine.module_9_risk import RULES as M9_RULES
 from stockpilot_api.engine.module_10_portfolio import RULES as M10_RULES
 from stockpilot_api.routers.agents import router as agents_router
+from stockpilot_api.routers.backtest import router as backtest_router
 from stockpilot_api.workflow import run_workflow
 
 logging.basicConfig(level=logging.INFO)
@@ -43,6 +44,7 @@ app.add_middleware(
 )
 
 app.include_router(agents_router)
+app.include_router(backtest_router)
 
 
 @app.get("/health")
@@ -74,6 +76,66 @@ def info() -> dict[str, object]:
             "M7": len(M7_RULES), "M8": len(M8_RULES), "M9": len(M9_RULES),
             "M10": len(M10_RULES),
         },
+    }
+
+
+# M1 rules whose inputs are static v1 defaults (not live data) — the UI labels
+# these "estimated" so a default never masquerades as a live reading.
+# Real from Nifty OHLCV: M1.1-M1.5, M1.8. Proxied by Nifty: M1.9, M1.10.
+_M1_STATIC_INPUT_RULES = frozenset(
+    {"M1.6", "M1.7", "M1.11", "M1.12", "M1.13", "M1.14", "M1.15"}
+)
+_M1_PROXY_RULES = frozenset({"M1.9", "M1.10"})
+
+
+@app.get("/market/environment")
+def market_environment() -> dict:
+    """Module 1 (Market Environment) evaluated on FRESH Nifty data.
+
+    Honest by construction: every check reports whether its input is live
+    (Nifty OHLCV), a proxy (mid/small-cap reuse Nifty in v1), or a static
+    default (VIX/FII/breadth — ingestion pending).
+    """
+    from stockpilot_api.engine.module_1_market import evaluate_market_environment
+    from stockpilot_api.workflow import _build_market_context, _fetch_daily
+
+    nifty = _fetch_daily("^NSEI", period="2y")
+    if nifty.empty or len(nifty) < 200:
+        raise HTTPException(status_code=503, detail="Could not fetch Nifty history")
+
+    module = evaluate_market_environment(_build_market_context(nifty))
+
+    if not module.hard_gates_passed:
+        verdict = "bearish"
+    elif module.score >= 70:
+        verdict = "bullish"
+    else:
+        verdict = "neutral"
+
+    return {
+        "as_of": nifty.index[-1].date().isoformat(),
+        "nifty_close": round(float(nifty["close"].iloc[-1]), 2),
+        "score": module.score,
+        "verdict": verdict,
+        "hard_gates_passed": module.hard_gates_passed,
+        "checks": [
+            {
+                "rule_id": r.rule_id,
+                "label": str(r.threshold),
+                "passed": r.passed,
+                "detail": str(r.actual_value),
+                "hard_gate": r.is_hard_gate,
+                "citation": r.source_citation,
+                "input_quality": (
+                    "static_default"
+                    if r.rule_id in _M1_STATIC_INPUT_RULES
+                    else "proxy"
+                    if r.rule_id in _M1_PROXY_RULES
+                    else "live"
+                ),
+            }
+            for r in module.rule_evaluations
+        ],
     }
 
 

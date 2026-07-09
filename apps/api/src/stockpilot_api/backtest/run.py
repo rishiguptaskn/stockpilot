@@ -44,8 +44,18 @@ DEFAULT_UNIVERSE = [
 MIN_BARS = 260  # ≥ 253 for RS-252 + headroom
 
 
-def make_rule_engine_scan_fn(nifty: pd.DataFrame, capital_inr: float, min_score: float):
-    """Adapter: point-in-time slices -> production rule engine -> TradeSignals."""
+def make_rule_engine_scan_fn(
+    nifty: pd.DataFrame,
+    capital_inr: float,
+    min_score: float,
+    *,
+    require_pattern: bool = False,
+):
+    """Adapter: point-in-time slices -> production rule engine -> TradeSignals.
+
+    require_pattern=True acts only when a pattern detector fired (18-pt
+    checklist items 9-10) — the variant that tested best in BACKTEST_FINDINGS.
+    """
 
     def scan_fn(as_of: pd.Timestamp, slices: dict[str, pd.DataFrame]) -> list[TradeSignal]:
         nifty_slice = nifty.loc[:as_of]
@@ -81,6 +91,8 @@ def make_rule_engine_scan_fn(nifty: pd.DataFrame, capital_inr: float, min_score:
                 continue
             if candidate is None:
                 continue
+            if require_pattern and not candidate.detected_patterns:
+                continue
             if candidate.aggregate_score >= min_score and candidate.hard_gates_all_passed:
                 signals.append(
                     TradeSignal(
@@ -112,27 +124,53 @@ def run(
     tickers: list[str],
     period: str = "5y",
     config: BacktestConfig | None = None,
+    *,
+    require_pattern: bool = False,
+    progress_cb=None,  # (phase: str, done: int, total: int) -> None
 ) -> tuple[BacktestResult, dict]:
     """Fetch data, run the backtest, return (result, report_dict)."""
     cfg = config or BacktestConfig()
 
+    def _progress(phase: str, done: int, total: int) -> None:
+        if progress_cb is not None:
+            try:
+                progress_cb(phase, done, total)
+            except Exception:  # progress must never break the run
+                logger.debug("progress_cb raised", exc_info=True)
+
     logger.info("Fetching %s of history for %d tickers + Nifty…", period, len(tickers))
+    _progress("fetching", 0, len(tickers) + 1)
     nifty = _fetch_daily("^NSEI", period=period)
     if nifty.empty or len(nifty) < 200:
         raise RuntimeError("Failed to fetch Nifty history — cannot build market context.")
+    _progress("fetching", 1, len(tickers) + 1)
 
     data: dict[str, pd.DataFrame] = {}
-    for t in tickers:
+    for i, t in enumerate(tickers):
         df = _fetch_daily(t, period=period)
         if len(df) >= MIN_BARS:
             data[t] = df
         else:
             logger.warning("Dropping %s — only %d bars (< %d)", t, len(df), MIN_BARS)
+        _progress("fetching", i + 2, len(tickers) + 1)
     if not data:
         raise RuntimeError("No tickers with sufficient history.")
 
-    scan_fn = make_rule_engine_scan_fn(nifty, cfg.capital_inr, cfg.min_score)
-    result = run_backtest(data, scan_fn, cfg)
+    # Scoring dominates wall-clock: report scan-date progress from inside scan_fn.
+    calendar = sorted(set().union(*(df.index for df in data.values())))
+    total_scans = max(1, len(calendar) // cfg.scan_every_n_days + 1)
+    scans_done = {"n": 0}
+    inner = make_rule_engine_scan_fn(
+        nifty, cfg.capital_inr, cfg.min_score, require_pattern=require_pattern
+    )
+
+    def counting_scan(as_of, slices):
+        signals = inner(as_of, slices)
+        scans_done["n"] += 1
+        _progress("scoring", scans_done["n"], total_scans)
+        return signals
+
+    result = run_backtest(data, counting_scan, cfg)
     metrics = compute_metrics(result)
 
     report = {
@@ -146,7 +184,12 @@ def run(
             "max_hold_days": cfg.max_hold_days,
             "scan_every_n_days": cfg.scan_every_n_days,
             "min_score": cfg.min_score,
+            "require_pattern": require_pattern,
         },
+        "equity_curve": [
+            {"date": d.date().isoformat(), "equity": round(float(v), 2)}
+            for d, v in result.equity_curve.items()
+        ],
         "metrics": metrics.to_dict(),
         "skipped_signals": dict(result.skipped_signals),
         "trades": [
