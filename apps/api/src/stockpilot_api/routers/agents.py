@@ -26,7 +26,9 @@ from stockpilot_api.agents.persistence import record_runs
 from stockpilot_api.auth import optional_user_id
 from stockpilot_api.llm.client import AnthropicTransport
 from stockpilot_api.llm.config import LLMConfig
+from stockpilot_api.llm.gateway import build_transport
 from stockpilot_api.mcp.data_access import clear_cache
+from stockpilot_api.orchestration import run_research
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +86,45 @@ def analyze(
         logger.exception("analyze failed for %s", req.ticker)
         raise HTTPException(status_code=500, detail=f"Analysis failed: {exc}") from exc
     return payload
+
+
+class _NullTransport:
+    """No-provider fallback: every agent call fails softly → the graph still
+    produces the full deterministic report (scores, risk gate, rule breakdown)
+    with degraded findings and an explicit error trail."""
+
+    def create(self, **kwargs: Any):  # noqa: ANN201
+        raise RuntimeError(
+            "No LLM provider configured (set ANTHROPIC_API_KEY and/or OPENAI_API_KEY). "
+            "Deterministic analysis is unaffected."
+        )
+
+
+@router.post("/research")
+def research(
+    req: AnalyzeRequest,
+    user_id: str | None = Depends(optional_user_id),
+) -> dict[str, Any]:
+    """LangGraph research run: quant → agents → risk gate → decision → chief → explain.
+
+    Returns the full explainable report (rule breakdown, risk plan, findings,
+    narrative, disclaimer). Deterministic decision; LLM narrates only. With no
+    LLM key configured the deterministic report still returns, with degraded
+    findings and the reason recorded in `errors`.
+    """
+    if req.force_refresh:
+        clear_cache()
+    config = LLMConfig.from_env()
+    try:
+        transport: Any = build_transport(config)
+    except RuntimeError:
+        logger.warning("no LLM provider configured — running deterministic-only research")
+        transport = _NullTransport()
+    try:
+        return run_research(req.ticker, transport, config)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("research failed for %s", req.ticker)
+        raise HTTPException(status_code=500, detail=f"Research failed: {exc}") from exc
 
 
 @router.get("/analyze/stream")

@@ -108,6 +108,7 @@ def _score_stock(
     sector_ctx: SectorContext | None,
     rs_rank: float,
     capital_inr: float = 500_000.0,
+    include_details: bool = False,
 ) -> CandidateOutput | None:
     if len(daily) < 200:
         return None
@@ -188,6 +189,11 @@ def _score_stock(
     all_modules = [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10]
     verdict = aggregate_scores(all_modules)
 
+    metadata: dict = {}
+    if include_details:
+        # Full per-rule breakdown for the explainability engine (ARCHITECTURE.md §13)
+        metadata["module_details"] = [m.model_dump(mode="json") for m in all_modules]
+
     return CandidateOutput(
         ticker=ticker,
         aggregate_score=verdict.aggregate_score,
@@ -199,6 +205,7 @@ def _score_stock(
         stop=stop,
         target=target,
         shares=shares,
+        metadata=metadata,
     )
 
 

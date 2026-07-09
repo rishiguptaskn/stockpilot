@@ -62,6 +62,10 @@ class LLMConfig:
     def api_key(self) -> str | None:
         return os.environ.get("ANTHROPIC_API_KEY")
 
+    @property
+    def openai_api_key(self) -> str | None:
+        return os.environ.get("OPENAI_API_KEY")
+
     @classmethod
     def from_env(cls) -> LLMConfig:
         sonnet_only = _env_bool("STOCKPILOT_SONNET_ONLY")

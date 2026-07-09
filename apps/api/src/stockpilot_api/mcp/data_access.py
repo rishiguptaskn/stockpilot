@@ -45,6 +45,9 @@ def load_daily(ticker: str, *, period: str = "2y") -> pd.DataFrame:
         df = df.copy()
         df.index = pd.to_datetime(df.index)
         df.index.name = "date"
+        # Data validation boundary: NaN bars (partial sessions, vendor glitches)
+        # must never reach the rule engine — int(NaN) crashes Module 9.
+        df = df.dropna(subset=["open", "high", "low", "close"])
     _CACHE[key] = df
     return df
 
