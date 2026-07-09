@@ -90,6 +90,7 @@ def make_rule_engine_scan_fn(nifty: pd.DataFrame, capital_inr: float, min_score:
                         stop=candidate.stop,
                         target=candidate.target,
                         score=candidate.aggregate_score,
+                        patterns=tuple(candidate.detected_patterns),
                     )
                 )
         return signals

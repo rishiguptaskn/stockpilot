@@ -40,6 +40,7 @@ class TradeSignal:
     stop: float
     target: float
     score: float
+    patterns: tuple[str, ...] = ()  # detected pattern names (18-pt checklist items 9-10)
 
 
 @dataclass
