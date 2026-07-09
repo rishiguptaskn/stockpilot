@@ -205,3 +205,58 @@ export interface ResearchReportWire {
   run_id?: string;
   cost_usd?: number;
 }
+
+/**
+ * LangGraph research run (POST /agents/research) — the full explainable report:
+ * deterministic decision + risk gate + per-rule breakdown + AI narrative.
+ */
+export type ResearchAction = 'candidate' | 'watch' | 'no-trade';
+
+export interface GraphRiskWire {
+  verdict: 'ok' | 'veto';
+  reasons: string[];
+  plan: {
+    entry: number | null;
+    stop: number | null;
+    target: number | null;
+    shares: number;
+    risk_inr: number | null;
+  } | null;
+}
+
+export interface GraphFailedRuleWire {
+  rule_id: string | null;
+  actual: string | number | null;
+  threshold: string | number | null;
+  hard_gate: boolean;
+  citation: string | null;
+}
+
+export interface GraphModuleBreakdownWire {
+  module_id: string;
+  module_name: string;
+  score: number;
+  weight: number;
+  hard_gates_passed: boolean;
+  failed_rules: GraphFailedRuleWire[];
+}
+
+export interface GraphResearchReportWire {
+  ticker: string;
+  as_of: string;
+  action: ResearchAction;
+  aggregate_score: number;
+  engine_verdict: string;
+  risk: GraphRiskWire;
+  overall_stance: Stance;
+  confidence: number;
+  narrative: string;
+  uncertainties: string[];
+  findings: AgentFindingWire[];
+  detected_patterns: string[];
+  rule_breakdown: GraphModuleBreakdownWire[];
+  notes: string[];
+  errors: string[];
+  disclaimer: string;
+  generated_at: string;
+}

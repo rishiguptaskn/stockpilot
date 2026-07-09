@@ -2,12 +2,13 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { AppShell } from '@/components/layout/app-shell';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { TradingViewChart } from '@/components/stock/tradingview-chart';
 import { AiResearchPanel } from '@/components/stock/ai-research-panel';
+import { GraphResearchPanel } from '@/components/stock/graph-research-panel';
 import { getServerSupabase } from '@/lib/supabase/server';
 
 interface Params {
@@ -108,99 +109,14 @@ export default async function StockDetailPage({
           <TradingViewChart symbol={tvSymbol} />
         </Card>
 
-        {/* AI research report — Master + Technical agents over the rule engine */}
-        <AiResearchPanel ticker={normalizedTicker} />
-
-        {/* Rule breakdown placeholder */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm text-muted-foreground">
-                Aggregate score
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="font-mono text-3xl font-semibold tabular-nums">
-                — <span className="text-lg text-muted-foreground">/100</span>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Needs rule engine + price data ingestion. Coming when Modules 2–10 ship.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm text-muted-foreground">
-                Detected patterns
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">—</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                VCP / Cup&amp;Handle / Stage 2 / Bull Flag detection ships with pattern
-                detectors module.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm text-muted-foreground">Verdict</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Badge variant="outline" className="border-zinc-500/30 bg-zinc-500/10">
-                Not scored yet
-              </Badge>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Verdict = candidate (≥ 90) · watch (85-89) · reject (&lt; 75)
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Deep research — full LangGraph pass: rule engine + risk gate + AI synthesis.
+            Replaces the old placeholder score/pattern/verdict cards with live data. */}
+        <GraphResearchPanel ticker={normalizedTicker} />
 
         <Separator />
 
-        {/* Rule module breakdown skeleton */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Per-module scores</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="grid grid-cols-1 divide-y divide-border">
-              {[
-                { id: 'M1', name: 'Market Environment', weight: 15 },
-                { id: 'M2', name: 'Sector Strength', weight: 10 },
-                { id: 'M3', name: 'Fundamentals (CAN SLIM)', weight: 15 },
-                { id: 'M4', name: 'Technical Analysis', weight: 15 },
-                { id: 'M5', name: 'Moving Averages', weight: 10 },
-                { id: 'M6', name: 'Momentum', weight: 5 },
-                { id: 'M7', name: 'Volume Analysis', weight: 10 },
-                { id: 'M8', name: 'News & Events', weight: 5 },
-                { id: 'M9', name: 'Risk Management', weight: 10 },
-                { id: 'M10', name: 'Portfolio Fit', weight: 5 },
-              ].map((m) => (
-                <div
-                  key={m.id}
-                  className="flex items-center justify-between px-6 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono text-xs text-muted-foreground">
-                      {m.id}
-                    </span>
-                    <span className="text-sm">{m.name}</span>
-                    <Badge variant="outline" className="font-mono text-[10px]">
-                      weight {m.weight}
-                    </Badge>
-                  </div>
-                  <span className="font-mono text-sm tabular-nums text-muted-foreground">
-                    —/100
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Legacy quick AI analysis (SSE trace of Master + Technical agents) */}
+        <AiResearchPanel ticker={normalizedTicker} />
       </div>
     </AppShell>
   );

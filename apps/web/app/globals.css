@@ -12,51 +12,53 @@
    `border-border`, `text-bullish`, etc. throughout the app.
    ============================================================================ */
 
-/* --- Light mode (default) -------------------------------------------------- */
+/* --- Light mode ("white display") -------------------------------------------
+   Same indigo brand as dark, on white/very-light-blue surfaces.
+   --------------------------------------------------------------------------- */
 :root {
   --radius: 0.625rem;
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.985 0.003 265);          /* near-white, cool tint */
+  --foreground: oklch(0.2 0.02 270);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.2 0.02 270);
 
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.2 0.02 270);
 
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.52 0.2 268);                /* indigo, darker for contrast on white */
+  --primary-foreground: oklch(0.985 0.005 260);
 
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.955 0.008 268);
+  --secondary-foreground: oklch(0.25 0.03 270);
 
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted: oklch(0.955 0.008 268);
+  --muted-foreground: oklch(0.5 0.02 268);
 
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: oklch(0.94 0.015 268);
+  --accent-foreground: oklch(0.25 0.03 270);
 
   --destructive: oklch(0.577 0.245 27.325);
 
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.9 0.01 268);
+  --input: oklch(0.9 0.01 268);
+  --ring: oklch(0.52 0.2 268 / 60%);
 
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --chart-1: oklch(0.52 0.2 268);                /* indigo */
+  --chart-2: oklch(0.6 0.15 162);                /* emerald */
+  --chart-3: oklch(0.66 0.16 70);                /* amber */
+  --chart-4: oklch(0.55 0.15 300);               /* violet */
+  --chart-5: oklch(0.58 0.12 220);               /* cyan */
 
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.97 0.005 265);
+  --sidebar-foreground: oklch(0.2 0.02 270);
+  --sidebar-primary: oklch(0.52 0.2 268);
+  --sidebar-primary-foreground: oklch(0.985 0.005 260);
+  --sidebar-accent: oklch(0.94 0.015 268);
+  --sidebar-accent-foreground: oklch(0.25 0.03 270);
+  --sidebar-border: oklch(0.9 0.01 268);
+  --sidebar-ring: oklch(0.52 0.2 268 / 60%);
 
   /* StockPilot semantic accents (Tailwind palette) */
   --bullish: oklch(0.696 0.17 162.48);         /* emerald-500 */
@@ -69,49 +71,52 @@
   --info-foreground: oklch(0.985 0 0);
 }
 
-/* --- Dark mode (default per PLAN.md § 11) --------------------------------- */
+/* --- Dark mode (default per PLAN.md § 11) ----------------------------------
+   Deep-navy "midnight" theme with indigo-blue accents — premium SaaS aesthetic
+   (aniq template-2 inspired; implemented from scratch on our tokens).
+   --------------------------------------------------------------------------- */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
+  --background: oklch(0.13 0.014 275);           /* near-black navy */
+  --foreground: oklch(0.96 0.006 260);
 
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
+  --card: oklch(0.168 0.016 272);                /* dark navy card */
+  --card-foreground: oklch(0.96 0.006 260);
 
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.168 0.016 272);
+  --popover-foreground: oklch(0.96 0.006 260);
 
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: oklch(0.58 0.19 268);               /* vivid indigo-blue */
+  --primary-foreground: oklch(0.985 0.005 260);
 
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.215 0.02 270);
+  --secondary-foreground: oklch(0.96 0.006 260);
 
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
+  --muted: oklch(0.215 0.02 270);
+  --muted-foreground: oklch(0.67 0.02 265);
 
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.235 0.03 270);
+  --accent-foreground: oklch(0.96 0.006 260);
 
   --destructive: oklch(0.704 0.191 22.216);
 
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --border: oklch(0.92 0.02 270 / 9%);           /* hairline navy-white */
+  --input: oklch(0.92 0.02 270 / 14%);
+  --ring: oklch(0.58 0.19 268 / 70%);
 
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  --chart-1: oklch(0.58 0.19 268);               /* indigo (primary series) */
+  --chart-2: oklch(0.696 0.17 162.48);           /* emerald */
+  --chart-3: oklch(0.769 0.188 70.08);           /* amber */
+  --chart-4: oklch(0.65 0.15 300);               /* violet */
+  --chart-5: oklch(0.7 0.12 220);                /* cyan */
 
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: oklch(0.115 0.013 275);             /* a shade deeper than bg */
+  --sidebar-foreground: oklch(0.96 0.006 260);
+  --sidebar-primary: oklch(0.58 0.19 268);
+  --sidebar-primary-foreground: oklch(0.985 0.005 260);
+  --sidebar-accent: oklch(0.215 0.02 270);
+  --sidebar-accent-foreground: oklch(0.96 0.006 260);
+  --sidebar-border: oklch(0.92 0.02 270 / 8%);
+  --sidebar-ring: oklch(0.58 0.19 268 / 70%);
 
   --bullish: oklch(0.696 0.17 162.48);
   --bullish-foreground: oklch(0.985 0 0);
@@ -206,4 +211,60 @@ html {
 code, kbd, samp, pre {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
   font-feature-settings: "cv02", "cv03", "cv04";
+}
+
+/* ============================================================================
+   Midnight theme signature pieces
+   ============================================================================ */
+
+/* Ambient indigo glow behind the whole app (template-2's radial atmosphere). */
+.dark body {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, oklch(0.58 0.19 268 / 10%), transparent),
+    radial-gradient(ellipse 60% 40% at 85% 110%, oklch(0.58 0.19 268 / 5%), transparent);
+  background-attachment: fixed;
+}
+
+@layer utilities {
+  /* Eyebrow chip: tiny uppercase section label in a tinted pill. */
+  .eyebrow-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-primary/25
+      bg-primary/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em]
+      text-primary;
+  }
+
+  /* Indigo glow for primary CTAs and highlighted panels. */
+  .glow-primary {
+    box-shadow: 0 0 24px -6px oklch(0.58 0.19 268 / 45%);
+  }
+  .glow-primary-sm {
+    box-shadow: 0 0 14px -4px oklch(0.58 0.19 268 / 35%);
+  }
+
+  /* Hero panel: card with a soft radial indigo wash (page headers). */
+  .panel-hero {
+    background-image: radial-gradient(
+      ellipse 90% 120% at 50% -30%,
+      oklch(0.58 0.19 268 / 14%),
+      transparent 70%
+    );
+  }
+
+  /* Elevated glass card for overlays/highlights. */
+  .card-glass {
+    @apply border border-border bg-card/70 backdrop-blur-md;
+  }
+
+  /* Gradient display text for hero numbers/headings. */
+  .text-gradient-primary {
+    background-image: linear-gradient(
+      100deg,
+      oklch(0.96 0.006 260),
+      oklch(0.72 0.12 268) 55%,
+      oklch(0.58 0.19 268)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 }
